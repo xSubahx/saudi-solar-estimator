@@ -1,8 +1,9 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Outfit, Source_Serif_4 } from 'next/font/google';
 import './globals.css';
 
-const inter = Inter({ subsets: ['latin'] });
+const outfit = Outfit({ subsets: ['latin'], variable: '--font-outfit', display: 'swap' });
+const sourceSerif = Source_Serif_4({ subsets: ['latin'], variable: '--font-serif', display: 'swap' });
 
 export const metadata: Metadata = {
   title: 'Saudi Solar Savings Estimator | Free PVGIS Tool',
@@ -22,8 +23,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" dir="ltr">
-      <body className={`${inter.className} antialiased`}>{children}</body>
+    <html lang="en" dir="ltr" data-theme="dark" className={`${outfit.variable} ${sourceSerif.variable}`}>
+      <body className="antialiased">
+        <script dangerouslySetInnerHTML={{ __html: `
+  try {
+    const t = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', t);
+  } catch(e) {}
+`}} />
+        {children}
+      </body>
     </html>
   );
 }

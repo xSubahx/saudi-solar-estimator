@@ -177,6 +177,19 @@ export interface EconomicsResult {
   annualSavingsRangeMin: number; // SAR
   annualSavingsRangeMax: number; // SAR
   co2OffsetTonsPerYear: number;
+  costPerPanel: number;            // totalInstallCost / panelCount
+  costPerKwp: number;              // totalInstallCost / systemKwp
+  cumulativeSavings25yr: number;   // sum of 25-year yearly net savings
+  monthlySavingsMin: number;       // annualSavingsMin / 12
+  monthlySavingsMax: number;       // annualSavingsMax / 12
+  co2OffsetTonnesPerYear: number;  // annualProduction * 0.00057
+}
+
+export interface CitizenComparisonsData {
+  monthsFreePerYear: number;
+  treesEquivalentPerYear: number;
+  carTripsAvoided: number;
+  householdsEquivalent: number;
 }
 
 // ─── Full Estimator Result ────────────────────────────────────────────────────
@@ -188,6 +201,7 @@ export interface EstimatorResult {
   savings: SavingsRange;
   monthlyBreakdown: MonthlySavingsRow[];
   economics: EconomicsResult | null; // null when no CAPEX provided
+  citizenComparisons: CitizenComparisonsData | null; // null when economics are not calculated
   mode: SavingsMode;
   annualProductionKwh: number; // from PVGIS E_y
   computedAt: number; // Date.now()

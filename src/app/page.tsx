@@ -6,29 +6,40 @@ import { KPICards } from '@/components/dashboard/KPICards';
 import { MonthlyChart } from '@/components/dashboard/MonthlyChart';
 import { SensitivitySliders } from '@/components/dashboard/SensitivitySliders';
 import { RoofGauge } from '@/components/dashboard/RoofGauge';
-import { MethodologyPanel } from '@/components/dashboard/MethodologyPanel';
+import { EconomicsCard } from '@/components/dashboard/EconomicsCard';
+import { CitizenComparisons } from '@/components/dashboard/CitizenComparisons';
+import { TechnicalAppendix } from '@/components/dashboard/TechnicalAppendix';
 import { SkeletonDashboard } from '@/components/ui/Skeleton';
+import { ThemeToggle } from '@/components/layout/ThemeToggle';
 
 export default function Home() {
   const estimator = useEstimator();
   const { result, isLoading, error } = estimator;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-slate-50">
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--bg-primary)' }}>
       {/* Header */}
-      <header className="bg-white border-b border-slate-100 sticky top-0 z-40 shadow-sm">
+      <header
+        className="sticky top-0 z-40 shadow-sm border-b"
+        style={{
+          backgroundColor: 'var(--bg-secondary)',
+          borderColor: 'var(--border)',
+          backdropFilter: 'blur(8px)',
+        }}
+      >
         <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-2xl">☀️</span>
             <div>
-              <h1 className="text-sm font-bold text-slate-900 leading-tight">Saudi Solar Estimator</h1>
-              <p className="text-xs text-slate-500 hidden sm:block">Free · PVGIS data · SEC tariffs · No account needed</p>
+              <h1 className="text-sm font-bold leading-tight" style={{ color: 'var(--text-primary)' }}>Saudi Solar Estimator</h1>
+              <p className="text-xs hidden sm:block" style={{ color: 'var(--text-secondary)' }}>Free · PVGIS data · SEC tariffs · No account needed</p>
             </div>
           </div>
-          <div className="flex items-center gap-2 text-xs text-slate-500">
+          <div className="flex items-center gap-2 text-xs" style={{ color: 'var(--text-secondary)' }}>
             <span className="hidden md:inline">Data:</span>
             <span className="bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full text-xs font-medium">PVGIS (JRC)</span>
             <span className="bg-green-50 text-green-700 px-2 py-0.5 rounded-full text-xs font-medium">SEC Tariff</span>
+            <ThemeToggle />
           </div>
         </div>
       </header>
@@ -77,8 +88,11 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <footer className="mt-12 border-t border-slate-100 bg-white">
-        <div className="max-w-6xl mx-auto px-4 py-6 text-xs text-slate-500 space-y-1">
+      <footer
+        className="mt-12 border-t"
+        style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border)' }}
+      >
+        <div className="max-w-6xl mx-auto px-4 py-6 text-xs space-y-1" style={{ color: 'var(--text-secondary)' }}>
           <p>
             Solar irradiance data from{' '}
             <a href="https://re.jrc.ec.europa.eu/pvgis5" className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">
@@ -90,7 +104,7 @@ export default function Home() {
             </a>
             . Self-consumption range from Fraunhofer ISE.
           </p>
-          <p className="text-slate-400">
+          <p style={{ color: 'var(--text-secondary)', opacity: 0.7 }}>
             Estimates only — not financial advice. Verify with a qualified solar installer before investing.
             Export credit rate is never assumed by this tool.
           </p>
@@ -107,6 +121,12 @@ function DashboardContent({ estimator }: { estimator: ReturnType<typeof useEstim
   return (
     <div className="space-y-5">
       <KPICards result={result} />
+      {result.citizenComparisons && (
+        <CitizenComparisons comparisons={result.citizenComparisons} />
+      )}
+      {result.economics && (
+        <EconomicsCard economics={result.economics} />
+      )}
       <MonthlyChart data={result.monthlyBreakdown} />
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         <RoofGauge
@@ -117,17 +137,20 @@ function DashboardContent({ estimator }: { estimator: ReturnType<typeof useEstim
         />
         <SensitivitySliders estimator={estimator} />
       </div>
-      <MethodologyPanel result={result} inputs={inputs} />
+      <TechnicalAppendix result={result} inputs={inputs} />
     </div>
   );
 }
 
 function EmptyState() {
   return (
-    <div className="flex flex-col items-center justify-center h-64 rounded-xl border-2 border-dashed border-slate-200 text-center px-8">
+    <div
+      className="flex flex-col items-center justify-center h-64 rounded-xl border-2 border-dashed text-center px-8"
+      style={{ borderColor: 'var(--border)' }}
+    >
       <span className="text-4xl mb-3">☀️</span>
-      <p className="text-slate-600 font-medium">Your results will appear here</p>
-      <p className="text-sm text-slate-400 mt-1">
+      <p className="font-medium" style={{ color: 'var(--text-primary)' }}>Your results will appear here</p>
+      <p className="text-sm mt-1" style={{ color: 'var(--text-secondary)' }}>
         Complete the 4-step wizard and click &ldquo;Calculate My Solar Savings&rdquo;
       </p>
     </div>

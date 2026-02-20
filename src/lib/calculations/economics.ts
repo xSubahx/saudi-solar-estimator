@@ -1,4 +1,4 @@
-import type { EconomicsResult, PVSizingResult, AdvancedConfig } from '@/types';
+import type { CitizenComparisonsData, EconomicsResult, PVSizingResult, AdvancedConfig } from '@/types';
 import { ASSUMPTIONS } from '@/lib/data/assumptions';
 
 /**
@@ -55,6 +55,22 @@ export function calculateEconomics(
   const co2OffsetTonsPerYear =
     (annualProductionKwh * ASSUMPTIONS.economics.gridCO2IntensityKgPerKwh) / 1000;
 
+  // New citizen-friendly metrics
+  const costPerPanel = sizing.panelCount > 0 ? totalInstallCostSar / sizing.panelCount : 0;
+  const costPerKwp = sizing.systemKwp > 0 ? totalInstallCostSar / sizing.systemKwp : 0;
+
+  // Cumulative 25-year savings: sum yearly net savings over 25 years minus initial investment
+  let cumulativeSavings25yr = -totalInstallCostSar;
+  for (let year = 0; year < 25; year++) {
+    const degradationFactor = Math.pow(1 - degradation, year);
+    const yearNetSaving = midSavings * degradationFactor - annualOM;
+    cumulativeSavings25yr += yearNetSaving;
+  }
+
+  const monthlySavingsMin = annualSavingsMin / 12;
+  const monthlySavingsMax = annualSavingsMax / 12;
+  const co2OffsetTonnesPerYear = annualProductionKwh * 0.00057;
+
   return {
     simplePaybackYears: Math.round(simplePaybackYears * 10) / 10,
     npv25Years: Math.round(npv),
@@ -64,6 +80,12 @@ export function calculateEconomics(
     annualSavingsRangeMin: annualSavingsMin,
     annualSavingsRangeMax: annualSavingsMax,
     co2OffsetTonsPerYear: Math.round(co2OffsetTonsPerYear * 10) / 10,
+    costPerPanel: Math.round(costPerPanel),
+    costPerKwp: Math.round(costPerKwp),
+    cumulativeSavings25yr: Math.round(cumulativeSavings25yr),
+    monthlySavingsMin: Math.round(monthlySavingsMin * 100) / 100,
+    monthlySavingsMax: Math.round(monthlySavingsMax * 100) / 100,
+    co2OffsetTonnesPerYear: Math.round(co2OffsetTonnesPerYear * 100) / 100,
   };
 }
 
@@ -109,4 +131,18 @@ function estimateIRR(
 
   // If IRR is negative, the project never recoups its cost — return 0
   return rate > -0.99 ? rate * 100 : 0;
+}
+
+export function calculateCitizenComparisons(
+  annualSavingsMid: number,
+  monthlyBillBefore: number,
+  co2TonnesPerYear: number,
+  annualProductionKwh: number
+): CitizenComparisonsData {
+  return {
+    monthsFreePerYear: monthlyBillBefore > 0 ? annualSavingsMid / monthlyBillBefore : 0,
+    treesEquivalentPerYear: Math.round(co2TonnesPerYear * 1000 / 21),
+    carTripsAvoided: Math.round(co2TonnesPerYear * 1000 / 180),
+    householdsEquivalent: Number((annualProductionKwh / 36000).toFixed(1)),
+  };
 }

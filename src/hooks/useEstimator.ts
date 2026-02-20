@@ -11,13 +11,14 @@ import type {
   AdvancedConfig,
   ExportConfig,
   SavingsMode,
+  PVGISResponse,
 } from '@/types';
 import { DEFAULT_CITY } from '@/lib/data/saudiCities';
 import { ASSUMPTIONS } from '@/lib/data/assumptions';
 import { calculatePVSizing, displayAzimuthToPvgis } from '@/lib/calculations/pvSizing';
 import { calculateTariff } from '@/lib/calculations/tariff';
 import { calculateSavingsRange } from '@/lib/calculations/savings';
-import { calculateEconomics } from '@/lib/calculations/economics';
+import { calculateEconomics, calculateCitizenComparisons } from '@/lib/calculations/economics';
 
 const DEFAULT_INPUTS: EstimatorInputs = {
   city: DEFAULT_CITY,
@@ -118,10 +119,10 @@ export function useEstimator() {
 
       if (!res.ok) {
         const err = await res.json().catch(() => ({ error: 'Unknown error' }));
-        throw new Error(err.error ?? `Solar data fetch failed (${res.status})`);
+        throw new Error((err as { error?: string }).error ?? `Solar data fetch failed (${res.status})`);
       }
 
-      const pvgisData = await res.json();
+      const pvgisData = await res.json() as PVGISResponse;
 
       // 3. Calculate baseline tariff
       const tariff = calculateTariff(inputs.consumption.monthlyKwh);
@@ -147,6 +148,19 @@ export function useEstimator() {
             )
           : null;
 
+      // 6. Compute citizen comparisons (always computed — economics may be null)
+      const annualSavingsMid = (savingsRange.minSarPerYear + savingsRange.maxSarPerYear) / 2;
+      const monthlyBillBefore = tariff.monthlyBill;
+      const co2TonnesPerYear = economics
+        ? economics.co2OffsetTonnesPerYear
+        : annualProductionKwh * 0.00057;
+      const citizenComparisons = calculateCitizenComparisons(
+        annualSavingsMid,
+        monthlyBillBefore,
+        co2TonnesPerYear,
+        annualProductionKwh
+      );
+
       setResult({
         sizing,
         pvgisData,
@@ -154,6 +168,7 @@ export function useEstimator() {
         savings: savingsRange,
         monthlyBreakdown,
         economics,
+        citizenComparisons,
         mode: savingsMode,
         annualProductionKwh,
         computedAt: Date.now(),

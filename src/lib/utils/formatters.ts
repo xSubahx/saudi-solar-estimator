@@ -131,3 +131,60 @@ export function formatNumber(value: number, decimals?: number): string {
     maximumFractionDigits: d,
   }).format(value);
 }
+
+/**
+ * Formats a payback period with context.
+ * formatPaybackYears(7.5) → "7.5 years"
+ * formatPaybackYears(0.8) → "< 1 year"
+ * formatPaybackYears(30)  → "> 25 years"
+ */
+export function formatPaybackYears(years: number): string {
+  if (years < 1) return '< 1 year';
+  if (years > 25) return '> 25 years';
+  return `${years.toFixed(1)} years`;
+}
+
+/**
+ * Formats a cost per solar panel.
+ * formatCostPerPanel(7000) → "SAR 7,000 / panel"
+ */
+export function formatCostPerPanel(sar: number): string {
+  if (sar <= 0) return 'N/A';
+  const formatted = new Intl.NumberFormat('en-US', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(sar);
+  return `SAR ${formatted} / panel`;
+}
+
+/**
+ * Formats a monthly savings range.
+ * formatMonthlySavings(100, 200) → "SAR 100 – 200 / month"
+ */
+export function formatMonthlySavings(min: number, max: number): string {
+  const fmtMin = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(min);
+  const fmtMax = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(max);
+  return `SAR ${fmtMin} \u2013 ${fmtMax} / month`;
+}
+
+/**
+ * Formats "months of free electricity" value.
+ * formatMonthsFree(2.4) → "2.4 months free"
+ */
+export function formatMonthsFree(months: number): string {
+  if (months <= 0) return '0 months';
+  return `${months.toFixed(1)} months free`;
+}
+
+/**
+ * Formats a cost per kWp value.
+ * formatCostPerKwp(3500) → "SAR 3,500 / kWp"
+ */
+export function formatCostPerKwp(sar: number): string {
+  if (sar <= 0) return 'N/A';
+  const formatted = new Intl.NumberFormat('en-US', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(sar);
+  return `SAR ${formatted} / kWp`;
+}

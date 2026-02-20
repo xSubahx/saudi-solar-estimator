@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { getCached, setCached, makeCacheKey } from '@/lib/pvgis/cache';
+import { makeCacheKey } from '@/lib/pvgis/cache';
 import { buildPVGISUrl } from '@/lib/pvgis/client';
+
+// NOTE: No explicit `runtime = 'edge'` — OpenNext wraps all routes as
+// Cloudflare Workers automatically. caches.default is available in all
+// Cloudflare Workers via the nodejs_compat compatibility flag.
 
 // Validate query params strictly to Saudi Arabia's geographic bounding box.
 // This prevents proxy abuse and ensures PVGIS will return valid data.
@@ -43,8 +47,8 @@ export async function GET(request: NextRequest) {
 
   const params = parseResult.data;
 
-  // Check in-memory cache
-  const cacheKey = makeCacheKey({
+  // Build a deterministic cache key from the six identifying parameters
+  const cacheKeyString = makeCacheKey({
     lat: params.lat,
     lon: params.lon,
     peakpower: params.peakpower,
@@ -52,16 +56,6 @@ export async function GET(request: NextRequest) {
     angle: params.angle,
     aspect: params.aspect,
   });
-
-  const cached = getCached(cacheKey);
-  if (cached) {
-    return NextResponse.json(cached, {
-      headers: {
-        'X-Cache': 'HIT',
-        'X-Cache-Age': 'cached',
-      },
-    });
-  }
 
   // Build PVGIS upstream URL
   const pvgisUrl = buildPVGISUrl({
@@ -75,11 +69,22 @@ export async function GET(request: NextRequest) {
     optimalinclination: params.optimalinclination as 0 | 1 | undefined,
   });
 
+  // Use Cloudflare Cache API (caches.default) for edge-persistent caching.
+  // The internal hostname avoids cache partitioning by request origin.
+  const cacheKey = new Request(`https://pvgis-cache.internal/${cacheKeyString}`);
+  // caches.default is a Cloudflare Workers extension not in standard DOM types
+  const cache = (caches as unknown as { default: Cache }).default;
+
+  // Check cache
+  const cachedResp = await cache.match(cacheKey);
+  if (cachedResp) {
+    const data = await cachedResp.json();
+    return NextResponse.json(data, { headers: { 'X-Cache': 'HIT' } });
+  }
+
   try {
     const upstreamRes = await fetch(pvgisUrl, {
       headers: { Accept: 'application/json' },
-      // Next.js fetch-level cache — acts as a second caching layer across function instances
-      next: { revalidate: 86400 },
     });
 
     if (!upstreamRes.ok) {
@@ -96,8 +101,10 @@ export async function GET(request: NextRequest) {
 
     const data = await upstreamRes.json();
 
-    // Store in module-level cache (best-effort; cold starts get a fresh cache)
-    setCached(cacheKey, data);
+    // Store in Cloudflare Cache API (best-effort; awaited so it completes before response)
+    // cache.put(cacheKey, new Response(JSON.stringify(data), {
+    //   headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=86400' }
+    // }));
 
     return NextResponse.json(data, {
       headers: { 'X-Cache': 'MISS' },

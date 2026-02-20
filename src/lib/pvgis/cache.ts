@@ -1,7 +1,10 @@
-import type { CachedPVGISEntry, PVGISResponse } from '@/types';
-import { ASSUMPTIONS } from '@/lib/data/assumptions';
+// NOTE: On Cloudflare Pages edge runtime, caching is handled by caches.default in the route.
+// The in-memory Map-based cache is not viable on edge runtimes because each request can be
+// served by a different edge worker instance with its own isolated memory. The functions
+// below are retained as no-op stubs for import compatibility; all real caching logic has
+// been moved inline into src/app/api/pvgis/route.ts using the Web Cache API (caches.default).
 
-const pvgisCache = new Map<string, CachedPVGISEntry>();
+import type { PVGISResponse } from '@/types';
 
 /**
  * Builds a deterministic cache key from the six parameters that uniquely
@@ -27,42 +30,24 @@ export function makeCacheKey(params: {
 }
 
 /**
- * Returns the cached PVGIS response if it exists and has not exceeded the
- * configured TTL (default 24 hours). Returns null on miss or expiry.
+ * No-op stub. Caching is now handled by the Cloudflare Cache API (caches.default)
+ * directly in the route handler. This function always returns null.
  */
-export function getCached(key: string): PVGISResponse | null {
-  const entry = pvgisCache.get(key);
-  if (!entry) return null;
-
-  const ageMs = Date.now() - entry.fetchedAt;
-  if (ageMs > ASSUMPTIONS.pvgis.cacheTtlMs) {
-    // Entry is stale — evict it proactively so memory doesn't grow unbounded.
-    pvgisCache.delete(key);
-    return null;
-  }
-
-  return entry.data;
+export function getCached(_key: string): PVGISResponse | null {
+  return null;
 }
 
 /**
- * Stores a fresh PVGIS response in the in-memory cache, tagged with the
- * current timestamp so TTL can be evaluated on subsequent reads.
+ * No-op stub. Caching is now handled by the Cloudflare Cache API (caches.default)
+ * directly in the route handler. This function does nothing.
  */
-export function setCached(key: string, data: PVGISResponse): void {
-  const entry: CachedPVGISEntry = {
-    data,
-    fetchedAt: Date.now(),
-  };
-  pvgisCache.set(key, entry);
+export function setCached(_key: string, _data: PVGISResponse): void {
+  // no-op on edge runtime — see caches.default usage in route.ts
 }
 
 /**
- * Returns diagnostic information about the current cache state.
- * Useful for health-check or debug endpoints.
+ * No-op stub. Cache stats are not meaningful on a stateless edge runtime.
  */
 export function getCacheStats(): { size: number; keys: string[] } {
-  return {
-    size: pvgisCache.size,
-    keys: Array.from(pvgisCache.keys()),
-  };
+  return { size: 0, keys: [] };
 }

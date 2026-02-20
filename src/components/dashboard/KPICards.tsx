@@ -1,90 +1,90 @@
 'use client';
 
 import type { EstimatorResult } from '@/types';
-import { Card } from '@/components/ui/Card';
-import { formatKWp, formatKWh, formatSARRange, formatPct, formatYears } from '@/lib/utils/formatters';
+import { formatMonthlySavings, formatSARRange, formatPct, formatCO2 } from '@/lib/utils/formatters';
 
 interface KPICardsProps {
   result: EstimatorResult;
 }
 
-interface KPICardProps {
-  title: string;
-  value: string;
-  sub?: string;
-  accent?: string;
-  icon?: string;
-}
-
-function KPICard({ title, value, sub, accent = 'text-slate-900', icon }: KPICardProps) {
-  return (
-    <Card className="flex flex-col gap-1">
-      <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide flex items-center gap-1">
-        {icon && <span>{icon}</span>}
-        {title}
-      </span>
-      <span className={`text-xl font-bold leading-tight ${accent}`}>{value}</span>
-      {sub && <span className="text-xs text-slate-400">{sub}</span>}
-    </Card>
-  );
-}
-
 export function KPICards({ result }: KPICardsProps) {
-  const { sizing, annualProductionKwh, savings, tariff, economics } = result;
+  const { savings, economics, tariff, annualProductionKwh } = result;
 
+  const monthlySavingsMin = savings.minSarPerYear / 12;
+  const monthlySavingsMax = savings.maxSarPerYear / 12;
+
+  // Consumption offset %: how much of annual consumption is covered at the max self-consumption scenario
   const annualConsumption = tariff.annualBill / tariff.blendedRate;
   const offsetPct = annualConsumption > 0
     ? Math.min(100, Math.round((savings.maxKwhSelfConsumedPerYear / annualConsumption) * 100))
     : 0;
 
+  const co2Value = economics
+    ? economics.co2OffsetTonnesPerYear
+    : annualProductionKwh * 0.00057;
+
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-      <KPICard
-        icon="⚡"
-        title="Max PV Size"
-        value={formatKWp(sizing.systemKwp)}
-        sub={`~${sizing.panelCount} panels`}
-        accent="text-amber-600"
-      />
-      <KPICard
-        icon="☀️"
-        title="Annual Production"
-        value={formatKWh(annualProductionKwh)}
-        sub="from PVGIS data"
-        accent="text-amber-600"
-      />
-      <KPICard
-        icon="💰"
-        title="Estimated Savings"
-        value={formatSARRange(savings.minSarPerYear, savings.maxSarPerYear)}
-        sub={`Self-consumption ${savings.selfConsumptionRangePct[0]}–${savings.selfConsumptionRangePct[1]}%`}
-        accent="text-green-700"
-      />
-      <KPICard
-        icon="📊"
-        title="Consumption Offset"
-        value={formatPct(offsetPct)}
-        sub="up to (conservative)"
-        accent="text-blue-700"
-      />
-      {economics && economics.simplePaybackYears > 0 && economics.simplePaybackYears < 50 && (
-        <KPICard
-          icon="📅"
-          title="Simple Payback"
-          value={formatYears(economics.simplePaybackYears)}
-          sub={`NPV: SAR ${economics.npv25Years.toLocaleString()}`}
-          accent="text-purple-700"
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+      {/* Hero row — monthly savings */}
+      <div style={{
+        backgroundColor: 'var(--bg-card)',
+        border: '1px solid var(--accent)',
+        borderRadius: '16px',
+        padding: '24px',
+      }}>
+        <div className="accent-line" style={{ marginBottom: '12px' }} />
+        <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', margin: '0 0 6px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+          Estimated Monthly Savings
+        </p>
+        <p style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--accent)', margin: '0 0 4px', fontFamily: 'var(--font-outfit)' }}>
+          {formatMonthlySavings(monthlySavingsMin, monthlySavingsMax)}
+        </p>
+        <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', margin: 0 }}>
+          Based on 20–40% self-consumption range
+        </p>
+      </div>
+
+      {/* Supporting metrics row */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px' }}>
+        <SmallKPI
+          label="Bill coverage"
+          value={formatPct(offsetPct)}
+          subtext="of your electricity need"
         />
-      )}
-      {economics && (
-        <KPICard
-          icon="🌱"
-          title="CO₂ Offset"
-          value={`${economics.co2OffsetTonsPerYear} t/yr`}
-          sub="at 0.57 kg CO₂/kWh"
-          accent="text-green-700"
+        <SmallKPI
+          label="Annual savings"
+          value={formatSARRange(savings.minSarPerYear, savings.maxSarPerYear, 'SAR/yr')}
+          subtext="conservative estimate"
         />
-      )}
+        {economics && (
+          <SmallKPI
+            label="Payback period"
+            value={`${economics.simplePaybackYears.toFixed(1)} years`}
+            subtext="to recover investment"
+            highlight
+          />
+        )}
+        <SmallKPI
+          label="CO\u2082 offset"
+          value={formatCO2(co2Value)}
+          subtext="emissions avoided"
+        />
+      </div>
+    </div>
+  );
+}
+
+function SmallKPI({ label, value, subtext, highlight }: { label: string; value: string; subtext: string; highlight?: boolean }) {
+  return (
+    <div style={{
+      backgroundColor: 'var(--bg-card)',
+      border: `1px solid ${highlight ? 'var(--accent)' : 'var(--border)'}`,
+      borderRadius: '16px',
+      padding: '16px',
+    }}>
+      <p style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', margin: '0 0 4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}</p>
+      <p style={{ fontSize: '1rem', fontWeight: 700, color: highlight ? 'var(--accent)' : 'var(--text-primary)', margin: '0 0 2px', fontFamily: 'var(--font-outfit)' }}>{value}</p>
+      <p style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', margin: 0 }}>{subtext}</p>
     </div>
   );
 }
