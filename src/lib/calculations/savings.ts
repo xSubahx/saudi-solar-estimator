@@ -80,7 +80,8 @@ export function calculateSavingsRange(
   pvgisData: PVGISResponse,
   consumption: ConsumptionConfig,
   exportConfig: ExportConfig,
-  mode: SavingsMode
+  mode: SavingsMode,
+  selfConsumptionOverride?: number | null
 ): { savingsRange: SavingsRange; monthlyBreakdown: MonthlySavingsRow[] } {
   // Monthly production from PVGIS (E_m = average monthly energy production in kWh)
   const monthlyProduction = pvgisData.outputs.monthly.fixed.map((m) => m.E_m);
@@ -92,19 +93,26 @@ export function calculateSavingsRange(
   let scLow: number;
   let scHigh: number;
 
-  switch (mode) {
-    case 'net-billing':
-    case 'conservative':
-    default:
-      scLow = ASSUMPTIONS.selfConsumption.conservativeLow;   // 0.20
-      scHigh = ASSUMPTIONS.selfConsumption.conservativeHigh; // 0.40
-      break;
-    case 'profile':
-      // Stub: v2 will use hour-by-hour load-profile matching.
-      // For now, return a slightly higher range as a placeholder.
-      scLow = ASSUMPTIONS.selfConsumption.profileLow;   // 0.35
-      scHigh = ASSUMPTIONS.selfConsumption.profileHigh; // 0.60
-      break;
+  // If user has set a specific self-consumption value via the slider,
+  // use it as both low and high (single-point estimate instead of range)
+  if (selfConsumptionOverride != null && selfConsumptionOverride > 0) {
+    scLow = selfConsumptionOverride;
+    scHigh = selfConsumptionOverride;
+  } else {
+    switch (mode) {
+      case 'net-billing':
+      case 'conservative':
+      default:
+        scLow = ASSUMPTIONS.selfConsumption.conservativeLow;   // 0.35
+        scHigh = ASSUMPTIONS.selfConsumption.conservativeHigh; // 0.55
+        break;
+      case 'profile':
+        // Stub: v2 will use hour-by-hour load-profile matching.
+        // For now, return a slightly higher range as a placeholder.
+        scLow = ASSUMPTIONS.selfConsumption.profileLow;   // 0.50
+        scHigh = ASSUMPTIONS.selfConsumption.profileHigh; // 0.70
+        break;
+    }
   }
 
   const monthlyBreakdown: MonthlySavingsRow[] = [];

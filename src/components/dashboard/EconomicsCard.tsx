@@ -6,9 +6,47 @@ interface EconomicsCardProps {
   economics: EconomicsResult;
 }
 
+/**
+ * Computes what self-consumption %, export credit, or install cost would
+ * bring payback to exactly 25 years. Returns null for any scenario that
+ * is not achievable.
+ */
+function computeBreakEvenScenarios(economics: EconomicsResult) {
+  const { totalInstallCostSar, annualSavingsRangeMin, annualSavingsRangeMax } = economics;
+  const midSavings = (annualSavingsRangeMin + annualSavingsRangeMax) / 2;
+  // Target: payback = totalCost / netSavings = 25
+  // So netSavings = totalCost / 25
+  const requiredNetSavings = totalInstallCostSar / 25;
+
+  // Current mid self-consumption ratio (inferred from savings proportion)
+  // If midSavings > 0, the required SC% is proportional:
+  // requiredSC = currentSC × (requiredNetSavings + OM) / midSavings
+  // But we don't have OM or SC% directly. Instead, give simpler guidance.
+
+  // Required install cost for 25-yr payback at current savings
+  const requiredInstallCost = midSavings > 0 ? midSavings * 25 : null;
+
+  return {
+    requiredNetSavingsPerYear: Math.round(requiredNetSavings),
+    requiredInstallCostSar: requiredInstallCost != null ? Math.round(requiredInstallCost) : null,
+  };
+}
+
 export function EconomicsCard({ economics }: EconomicsCardProps) {
   const paybackYears = economics.simplePaybackYears;
+  const paybackExceedsLife = paybackYears > 25;
+  const paybackNotViable = paybackYears > 50;
+
+  // Ring percentage: capped at 100%, colored by viability
   const paybackPct = Math.min((paybackYears / 25) * 100, 100);
+  const ringColor = paybackExceedsLife ? '#d97706' : 'var(--accent)'; // amber-600 if over lifetime
+  const displayYears = paybackNotViable
+    ? 'N/A'
+    : paybackYears > 25
+      ? '25+'
+      : paybackYears.toFixed(1);
+
+  const breakEven = paybackExceedsLife ? computeBreakEvenScenarios(economics) : null;
 
   return (
     <div
@@ -35,7 +73,7 @@ export function EconomicsCard({ economics }: EconomicsCardProps) {
             <circle
               cx="40" cy="40" r="34"
               fill="none"
-              stroke="var(--accent)"
+              stroke={ringColor}
               strokeWidth="6"
               strokeLinecap="round"
               strokeDasharray={`${2 * Math.PI * 34}`}
@@ -48,8 +86,8 @@ export function EconomicsCard({ economics }: EconomicsCardProps) {
             position: 'absolute', inset: 0,
             display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
           }}>
-            <span style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--accent)', fontFamily: 'var(--font-outfit)' }}>
-              {paybackYears < 100 ? paybackYears.toFixed(1) : '25+'}
+            <span style={{ fontSize: '1.1rem', fontWeight: 700, color: ringColor, fontFamily: 'var(--font-outfit)' }}>
+              {displayYears}
             </span>
             <span style={{ fontSize: '0.6rem', color: 'var(--text-secondary)' }}>yrs</span>
           </div>
@@ -57,13 +95,59 @@ export function EconomicsCard({ economics }: EconomicsCardProps) {
 
         <div>
           <p style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--text-primary)', margin: '0 0 4px' }}>
-            {formatPaybackYears(paybackYears)} payback
+            {paybackNotViable ? 'Not viable' : formatPaybackYears(paybackYears)} payback
           </p>
           <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', margin: 0 }}>
             of a 25-year panel lifespan
           </p>
         </div>
       </div>
+
+      {/* Warning banner when payback exceeds panel lifetime */}
+      {paybackExceedsLife && (
+        <div style={{
+          backgroundColor: '#fffbeb',
+          border: '1px solid #fbbf24',
+          borderRadius: '10px',
+          padding: '12px 14px',
+          marginBottom: '16px',
+        }}>
+          <p style={{ fontSize: '0.8rem', fontWeight: 600, color: '#92400e', margin: '0 0 4px' }}>
+            {paybackNotViable
+              ? 'Investment does not pay back without export credits'
+              : 'Payback exceeds panel lifetime (25 years)'}
+          </p>
+          <p style={{ fontSize: '0.75rem', color: '#a16207', margin: 0 }}>
+            Saudi electricity rates (0.18 SAR/kWh) are heavily subsidized, making solar ROI challenging.
+            Try: increase self-consumption via the slider, enable net billing with export credits,
+            or find a lower installation cost.
+          </p>
+        </div>
+      )}
+
+      {/* Break-even scenarios */}
+      {breakEven && (
+        <div style={{
+          backgroundColor: 'var(--bg-secondary)',
+          borderRadius: '10px',
+          padding: '12px 14px',
+          marginBottom: '16px',
+        }}>
+          <p style={{ fontSize: '0.7rem', fontWeight: 600, color: 'var(--text-secondary)', margin: '0 0 8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            To reach 25-year payback
+          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <p style={{ fontSize: '0.75rem', color: 'var(--text-primary)', margin: 0 }}>
+              Need annual net savings of <strong>SAR {breakEven.requiredNetSavingsPerYear.toLocaleString()}</strong>/yr
+            </p>
+            {breakEven.requiredInstallCostSar != null && (
+              <p style={{ fontSize: '0.75rem', color: 'var(--text-primary)', margin: 0 }}>
+                Or reduce install cost to <strong>SAR {breakEven.requiredInstallCostSar.toLocaleString()}</strong> total
+              </p>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Metrics grid */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>

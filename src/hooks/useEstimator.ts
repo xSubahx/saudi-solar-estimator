@@ -43,6 +43,7 @@ const DEFAULT_INPUTS: EstimatorInputs = {
     projectLifeYears: ASSUMPTIONS.economics.projectLifeYears,
     installCostPerKwp: ASSUMPTIONS.economics.defaultInstallCostSarPerKwp,
     omCostPerKwpPerYear: ASSUMPTIONS.economics.defaultOmCostSarPerKwpPerYear,
+    selfConsumptionOverride: null, // null = use default range from assumptions
   },
   export: {
     enabled: false,
@@ -132,7 +133,8 @@ export function useEstimator() {
         pvgisData,
         inputs.consumption,
         inputs.export,
-        savingsMode
+        savingsMode,
+        inputs.advanced.selfConsumptionOverride
       );
 
       // 5. Calculate economics (only if CAPEX is provided)

@@ -1,7 +1,7 @@
 'use client';
 
 import type { EstimatorResult } from '@/types';
-import { formatMonthlySavings, formatSARRange, formatPct, formatCO2 } from '@/lib/utils/formatters';
+import { formatMonthlySavings, formatSARRange, formatPct, formatCO2, formatPaybackYears } from '@/lib/utils/formatters';
 
 interface KPICardsProps {
   result: EstimatorResult;
@@ -40,7 +40,7 @@ export function KPICards({ result }: KPICardsProps) {
           {formatMonthlySavings(monthlySavingsMin, monthlySavingsMax)}
         </p>
         <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', margin: 0 }}>
-          Based on 20–40% self-consumption range
+          Based on {savings.selfConsumptionRangePct[0]}–{savings.selfConsumptionRangePct[1]}% self-consumption range
         </p>
       </div>
 
@@ -59,8 +59,8 @@ export function KPICards({ result }: KPICardsProps) {
         {economics && (
           <SmallKPI
             label="Payback period"
-            value={`${economics.simplePaybackYears.toFixed(1)} years`}
-            subtext="to recover investment"
+            value={formatPaybackYears(economics.simplePaybackYears)}
+            subtext={economics.simplePaybackYears > 25 ? 'exceeds panel lifetime' : 'to recover investment'}
             highlight
           />
         )}

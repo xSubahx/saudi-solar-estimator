@@ -39,16 +39,20 @@ export const ASSUMPTIONS = {
   },
 
   selfConsumption: {
-    conservativeLow: 0.20,
-    // 20% self-consumption: large PV system, daytime-absent household, no battery
-    conservativeHigh: 0.40,
-    // 40% self-consumption: daytime-present household, typical Saudi AC load profile
-    profileLow: 0.35, // stub for v2 load-profile mode
-    profileHigh: 0.60,
+    conservativeLow: 0.35,
+    // 35% self-consumption: Saudi residential with daytime AC load — lower bound
+    // Saudi AC load peaks midday-afternoon (40-50% of total demand), naturally
+    // coinciding with solar production hours. This is significantly higher than
+    // the Fraunhofer ISE European baseline of 20% for daytime-absent households.
+    conservativeHigh: 0.55,
+    // 55% self-consumption: Saudi household with heavy daytime AC and occupancy
+    // GCC studies show 35-60% without batteries for AC-heavy residential profiles.
+    profileLow: 0.50, // stub for v2 load-profile mode
+    profileHigh: 0.70,
     source:
-      'Fraunhofer ISE 2015 "Self-consumption of solar electricity" — typical residential without battery storage: 20–40%. https://www.ise.fraunhofer.de/content/dam/ise/de/documents/publications/studies/recent-facts-about-photovoltaics-in-germany.pdf',
+      'Adjusted for Saudi Arabia from Fraunhofer ISE 2015 baseline (20–40% for European residential). Saudi AC load peaks during solar production hours, raising self-consumption to 35–55% without batteries (GCC residential studies). Original: https://www.ise.fraunhofer.de/content/dam/ise/de/documents/publications/studies/recent-facts-about-photovoltaics-in-germany.pdf',
     rationale:
-      'A range is shown instead of a single value because self-consumption is highly sensitive to occupancy patterns and appliance timing, which are unknown without 15-min interval smart-meter data.',
+      'A range is shown instead of a single value because self-consumption is highly sensitive to occupancy patterns and appliance timing. Saudi defaults (35–55%) are higher than European values (20–40%) because heavy daytime AC load naturally coincides with solar production. Without 15-min smart-meter data, exact self-consumption cannot be determined.',
   },
 
   economics: {

@@ -87,6 +87,17 @@ export function SensitivitySliders({ estimator }: SensitivitySlidersProps) {
           onChange={(v) => updateAdvanced({ wPerM2: v })}
         />
         <SliderRow
+          label="Self-consumption"
+          value={inputs.advanced.selfConsumptionOverride != null
+            ? Math.round(inputs.advanced.selfConsumptionOverride * 100)
+            : 45}
+          min={15}
+          max={70}
+          step={5}
+          unit="%"
+          onChange={(v) => updateAdvanced({ selfConsumptionOverride: v / 100 })}
+        />
+        <SliderRow
           label="Export credit rate"
           value={inputs.export.creditRatePerKwh ?? 0}
           min={0}

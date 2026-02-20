@@ -37,7 +37,7 @@ export function MethodologyPanel({ result, inputs }: MethodologyPanelProps) {
       <div className="flex flex-wrap gap-2 mt-3">
         <Badge variant="info">Solar data: PVGIS (JRC, European Commission)</Badge>
         <Badge variant="info">Tariff: SEC residential 2018</Badge>
-        <Badge variant="default">Self-consumption: Fraunhofer ISE</Badge>
+        <Badge variant="default">Self-consumption: Saudi-adjusted (Fraunhofer ISE base)</Badge>
         {result.mode === 'net-billing' && inputs.export.creditRatePerKwh !== null && (
           <Badge variant="success">Net billing: user-supplied rate</Badge>
         )}
@@ -73,7 +73,7 @@ export function MethodologyPanel({ result, inputs }: MethodologyPanelProps) {
                 <span className="font-medium text-slate-700">4. Savings Range</span>
                 <br />
                 Self-consumption range: {savings.selfConsumptionRangePct[0]}–{savings.selfConsumptionRangePct[1]}% of production
-                (Fraunhofer ISE residential, no battery).
+                (Saudi-adjusted from Fraunhofer ISE baseline; higher than European 20–40% due to heavy daytime AC load coinciding with solar peak).
                 <br />
                 Annual savings = base bill − reduced bill after solar offset.
                 → <strong>SAR {savings.minSarPerYear.toLocaleString()} – {savings.maxSarPerYear.toLocaleString()}/yr</strong>
@@ -106,7 +106,7 @@ export function MethodologyPanel({ result, inputs }: MethodologyPanelProps) {
                     { param: 'Panel power density', value: `${inputs.advanced.wPerM2} W/m²`, source: 'Fraunhofer ISE' },
                     { param: 'Packing factor', value: `${inputs.advanced.packingFactor}`, source: 'User input / default' },
                     { param: 'System losses', value: `${inputs.advanced.systemLoss}%`, source: 'PVGIS baseline' },
-                    { param: 'Self-consumption range', value: `${savings.selfConsumptionRangePct[0]}–${savings.selfConsumptionRangePct[1]}%`, source: 'Fraunhofer ISE 2015' },
+                    { param: 'Self-consumption range', value: `${savings.selfConsumptionRangePct[0]}–${savings.selfConsumptionRangePct[1]}%`, source: 'Saudi-adjusted (Fraunhofer ISE base)' },
                     { param: 'Annual degradation', value: `${inputs.advanced.degradationPct}%/yr`, source: 'Fraunhofer ISE' },
                     { param: 'Tier 1 tariff', value: `0.18 SAR/kWh (≤6,000 kWh/mo)`, source: 'SEC 2018' },
                     { param: 'Tier 2 tariff', value: `0.30 SAR/kWh (>6,000 kWh/mo)`, source: 'SEC 2018' },
@@ -128,6 +128,9 @@ export function MethodologyPanel({ result, inputs }: MethodologyPanelProps) {
           <div className="bg-amber-50 rounded-lg px-3 py-2 space-y-1">
             <p className="font-medium text-amber-800">Important caveats</p>
             <p className="text-amber-700">{ASSUMPTIONS.selfConsumption.rationale}</p>
+            <p className="text-amber-700">
+              <strong>Why payback may seem long:</strong> Saudi residential electricity is heavily subsidized at 0.18 SAR/kWh (~$0.048 USD/kWh) — roughly 4–7x cheaper than European or US rates where solar typically pays back in 5–10 years. Without export credits (net billing), only self-consumed solar energy generates savings, and the low tariff rate means each kWh saved is worth very little financially. Enabling net billing with export credits is the primary path to viable payback in Saudi Arabia.
+            </p>
             {inputs.export.enabled && inputs.export.creditRatePerKwh === null && (
               <p className="text-amber-700">{ASSUMPTIONS.netBilling.exportCreditNote}</p>
             )}

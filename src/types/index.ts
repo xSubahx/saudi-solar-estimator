@@ -35,6 +35,7 @@ export interface AdvancedConfig {
   projectLifeYears: number; // default 25
   installCostPerKwp: number; // SAR/kWp; default 3500 (2024 Saudi market)
   omCostPerKwpPerYear: number; // SAR/kWp/yr; default 50
+  selfConsumptionOverride: number | null; // user-set SC% (0-1 fraction); null = use default range
 }
 
 export interface ExportConfig {
