@@ -7,13 +7,20 @@ interface SkeletonProps {
 
 export function Skeleton({ className }: { className?: string }) {
   return (
-    <div className={clsx('animate-pulse bg-slate-200 rounded', className)} />
+    <div className={clsx('skeleton-shimmer rounded', className)} />
   );
 }
 
 export function SkeletonCard() {
   return (
-    <div className="bg-white rounded-xl border border-slate-200 p-5 space-y-3">
+    <div
+      className="p-5 space-y-3"
+      style={{
+        backgroundColor: 'var(--bg-card)',
+        borderRadius: 'var(--radius-lg)',
+        border: '1px solid var(--border)',
+      }}
+    >
       <Skeleton className="h-4 w-24" />
       <Skeleton className="h-8 w-36" />
       <Skeleton className="h-3 w-20" />
@@ -29,7 +36,14 @@ export function SkeletonDashboard() {
           <SkeletonCard key={i} />
         ))}
       </div>
-      <div className="bg-white rounded-xl border border-slate-200 p-5">
+      <div
+        className="p-5"
+        style={{
+          backgroundColor: 'var(--bg-card)',
+          borderRadius: 'var(--radius-lg)',
+          border: '1px solid var(--border)',
+        }}
+      >
         <Skeleton className="h-4 w-32 mb-4" />
         <Skeleton className="h-64 w-full" />
       </div>

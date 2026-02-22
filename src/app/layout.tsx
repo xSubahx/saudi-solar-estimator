@@ -1,9 +1,28 @@
 import type { Metadata } from 'next';
-import { Outfit, Source_Serif_4 } from 'next/font/google';
+import { Syne, Newsreader, IBM_Plex_Mono } from 'next/font/google';
 import './globals.css';
 
-const outfit = Outfit({ subsets: ['latin'], variable: '--font-outfit', display: 'swap' });
-const sourceSerif = Source_Serif_4({ subsets: ['latin'], variable: '--font-serif', display: 'swap' });
+const syne = Syne({
+  subsets: ['latin'],
+  variable: '--font-syne',
+  display: 'swap',
+  weight: ['400', '500', '600', '700'],
+});
+
+const newsreader = Newsreader({
+  subsets: ['latin'],
+  variable: '--font-newsreader',
+  display: 'swap',
+  weight: ['400', '500', '600'],
+  style: ['normal', 'italic'],
+});
+
+const ibmPlexMono = IBM_Plex_Mono({
+  subsets: ['latin'],
+  variable: '--font-ibm-plex-mono',
+  display: 'swap',
+  weight: ['400', '500'],
+});
 
 export const metadata: Metadata = {
   title: 'Saudi Solar Savings Estimator | Free PVGIS Tool',
@@ -23,7 +42,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" dir="ltr" data-theme="dark" className={`${outfit.variable} ${sourceSerif.variable}`}>
+    <html lang="en" dir="ltr" data-theme="dark" className={`${syne.variable} ${newsreader.variable} ${ibmPlexMono.variable}`}>
       <body className="antialiased">
         <script dangerouslySetInnerHTML={{ __html: `
   try {

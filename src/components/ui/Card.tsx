@@ -8,11 +8,10 @@ interface CardProps {
 }
 
 export function Card({ children, className, padding = 'md' }: CardProps) {
-  const [hovered, setHovered] = React.useState(false);
-
   return (
     <div
       className={clsx(
+        'card-hover',
         {
           'p-0': padding === 'none',
           'p-4': padding === 'sm',
@@ -23,14 +22,9 @@ export function Card({ children, className, padding = 'md' }: CardProps) {
       )}
       style={{
         backgroundColor: 'var(--bg-card)',
-        border: `1px solid ${hovered ? 'var(--accent)' : 'var(--border)'}`,
-        borderRadius: '16px',
-        boxShadow: hovered ? '0 10px 30px rgba(0,0,0,0.15)' : undefined,
-        transform: hovered ? 'translateY(-3px)' : 'translateY(0)',
-        transition: 'all 0.3s ease-out',
+        border: '1px solid var(--border)',
+        borderRadius: 'var(--radius-lg)',
       }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
     >
       {children}
     </div>
@@ -47,7 +41,14 @@ export function CardHeader({ children, className }: { children: React.ReactNode;
 
 export function CardTitle({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
-    <h3 className={clsx('text-sm font-semibold uppercase tracking-wide', className)} style={{ color: 'var(--text-secondary)' }}>
+    <h3
+      className={clsx('text-sm font-semibold uppercase tracking-wide', className)}
+      style={{
+        color: 'var(--text-secondary)',
+        fontFamily: 'var(--font-syne)',
+        letterSpacing: '0.06em',
+      }}
+    >
       {children}
     </h3>
   );

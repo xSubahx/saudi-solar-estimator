@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 
 export default function Error({
@@ -15,11 +16,24 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
+    <div
+      className="min-h-screen flex items-center justify-center px-4"
+      style={{ backgroundColor: 'var(--bg-primary)' }}
+    >
       <div className="text-center max-w-md">
-        <div className="text-5xl mb-4">⚠️</div>
-        <h2 className="text-xl font-bold text-slate-900 mb-2">Something went wrong</h2>
-        <p className="text-sm text-slate-500 mb-6">
+        <div className="flex justify-center mb-4">
+          <AlertTriangle size={48} style={{ color: 'var(--warning)' }} />
+        </div>
+        <h2
+          className="text-xl mb-2"
+          style={{ fontFamily: 'var(--font-syne)', fontWeight: 700, color: 'var(--text-primary)' }}
+        >
+          Something went wrong
+        </h2>
+        <p
+          className="text-sm mb-6"
+          style={{ fontFamily: 'var(--font-newsreader)', color: 'var(--text-secondary)' }}
+        >
           An unexpected error occurred. Your inputs have not been saved.
         </p>
         <Button onClick={reset}>Try again</Button>

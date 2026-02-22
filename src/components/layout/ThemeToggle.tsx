@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
+import { Sun, Moon } from 'lucide-react';
 
 export function ThemeToggle() {
   // Single nullable state avoids calling setState twice in one effect
@@ -25,20 +26,31 @@ export function ThemeToggle() {
       onClick={toggle}
       aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
       style={{
-        background: 'transparent',
+        backgroundColor: 'var(--bg-elevated)',
         border: '1px solid var(--border)',
-        borderRadius: '8px',
+        borderRadius: 'var(--radius-sm)',
         padding: '6px 10px',
         cursor: 'pointer',
         color: 'var(--text-secondary)',
         fontSize: '16px',
         lineHeight: 1,
-        transition: 'transform 0.3s ease, border-color 0.3s ease',
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
       }}
-      onMouseEnter={(e) => { e.currentTarget.style.transform = 'rotate(30deg)'; }}
-      onMouseLeave={(e) => { e.currentTarget.style.transform = 'rotate(0deg)'; }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.borderColor = 'var(--accent)';
+        e.currentTarget.style.color = 'var(--accent)';
+        e.currentTarget.style.transform = 'rotate(15deg)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.borderColor = 'var(--border)';
+        e.currentTarget.style.color = 'var(--text-secondary)';
+        e.currentTarget.style.transform = 'rotate(0deg)';
+      }}
     >
-      {theme === 'dark' ? '☀️' : '🌙'}
+      {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
     </button>
   );
 }

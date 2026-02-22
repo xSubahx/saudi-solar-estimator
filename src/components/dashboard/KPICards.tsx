@@ -26,20 +26,20 @@ export function KPICards({ result }: KPICardsProps) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
       {/* Hero row — monthly savings */}
-      <div style={{
+      <div className="animate-accentPulse" style={{
         backgroundColor: 'var(--bg-card)',
-        border: '1px solid var(--accent)',
-        borderRadius: '16px',
+        border: '2px solid var(--accent)',
+        borderRadius: 'var(--radius-xl)',
         padding: '24px',
       }}>
         <div className="accent-line" style={{ marginBottom: '12px' }} />
-        <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', margin: '0 0 6px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+        <p style={{ fontSize: '0.75rem', fontFamily: 'var(--font-syne)', color: 'var(--text-secondary)', margin: '0 0 6px', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
           Estimated Monthly Savings
         </p>
-        <p style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--accent)', margin: '0 0 4px', fontFamily: 'var(--font-outfit)' }}>
+        <p style={{ fontSize: '2.25rem', fontWeight: 700, color: 'var(--accent)', margin: '0 0 4px', fontFamily: 'var(--font-syne)', letterSpacing: '-0.02em' }}>
           {formatMonthlySavings(monthlySavingsMin, monthlySavingsMax)}
         </p>
-        <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', margin: 0 }}>
+        <p style={{ fontSize: '0.8rem', fontFamily: 'var(--font-newsreader)', fontStyle: 'italic', color: 'var(--text-secondary)', margin: 0 }}>
           Based on {savings.selfConsumptionRangePct[0]}–{savings.selfConsumptionRangePct[1]}% self-consumption range
         </p>
       </div>
@@ -65,7 +65,7 @@ export function KPICards({ result }: KPICardsProps) {
           />
         )}
         <SmallKPI
-          label="CO\u2082 offset"
+          label="CO₂ offset"
           value={formatCO2(co2Value)}
           subtext="emissions avoided"
         />
@@ -79,12 +79,12 @@ function SmallKPI({ label, value, subtext, highlight }: { label: string; value: 
     <div style={{
       backgroundColor: 'var(--bg-card)',
       border: `1px solid ${highlight ? 'var(--accent)' : 'var(--border)'}`,
-      borderRadius: '16px',
+      borderRadius: 'var(--radius-lg)',
       padding: '16px',
     }}>
-      <p style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', margin: '0 0 4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}</p>
-      <p style={{ fontSize: '1rem', fontWeight: 700, color: highlight ? 'var(--accent)' : 'var(--text-primary)', margin: '0 0 2px', fontFamily: 'var(--font-outfit)' }}>{value}</p>
-      <p style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', margin: 0 }}>{subtext}</p>
+      <p style={{ fontSize: '0.7rem', fontFamily: 'var(--font-syne)', color: 'var(--text-secondary)', margin: '0 0 4px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</p>
+      <p style={{ fontSize: '1rem', fontWeight: 500, color: highlight ? 'var(--accent)' : 'var(--text-primary)', margin: '0 0 2px', fontFamily: 'var(--font-ibm-plex-mono)' }}>{value}</p>
+      <p style={{ fontSize: '0.7rem', fontFamily: 'var(--font-newsreader)', color: 'var(--text-secondary)', margin: 0 }}>{subtext}</p>
     </div>
   );
 }

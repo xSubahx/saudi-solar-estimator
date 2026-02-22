@@ -2,6 +2,7 @@
 
 import { Card, CardTitle } from '@/components/ui/Card';
 import { formatKWp } from '@/lib/utils/formatters';
+import { useThemeColors } from '@/hooks/useThemeColors';
 
 interface RoofGaugeProps {
   usableAreaM2: number;
@@ -11,6 +12,8 @@ interface RoofGaugeProps {
 }
 
 export function RoofGauge({ usableAreaM2, systemKwp, roofCoverage, panelCount }: RoofGaugeProps) {
+  const themeColors = useThemeColors();
+
   // SVG semicircle gauge parameters
   const size = 160;
   const cx = size / 2;
@@ -41,9 +44,9 @@ export function RoofGauge({ usableAreaM2, systemKwp, roofCoverage, panelCount }:
     : '';
 
   const gaugeColor =
-    roofCoverage >= 70 ? '#f59e0b' :
-    roofCoverage >= 40 ? '#fbbf24' :
-    '#e2e8f0';
+    roofCoverage >= 70 ? themeColors.accent :
+    roofCoverage >= 40 ? '#FACC15' :
+    themeColors.border;
 
   return (
     <Card>
@@ -54,7 +57,7 @@ export function RoofGauge({ usableAreaM2, systemKwp, roofCoverage, panelCount }:
           <path
             d={trackPath}
             fill="none"
-            stroke="#e2e8f0"
+            stroke={themeColors.border}
             strokeWidth={strokeWidth}
             strokeLinecap="round"
           />
@@ -70,26 +73,26 @@ export function RoofGauge({ usableAreaM2, systemKwp, roofCoverage, panelCount }:
             />
           )}
           {/* Center label */}
-          <text x={cx} y={cy - 4} textAnchor="middle" fontSize="22" fontWeight="bold" fill="#1e293b">
+          <text x={cx} y={cy - 4} textAnchor="middle" fontSize="22" fontWeight="bold" fill={themeColors.textPrimary} fontFamily="var(--font-syne)">
             {roofCoverage}%
           </text>
-          <text x={cx} y={cy + 14} textAnchor="middle" fontSize="10" fill="#94a3b8">
+          <text x={cx} y={cy + 14} textAnchor="middle" fontSize="10" fill={themeColors.textSecondary}>
             roof used
           </text>
         </svg>
 
-        <div className="w-full mt-2 space-y-1 text-xs text-slate-600">
+        <div className="w-full mt-2 space-y-1 text-xs" style={{ color: 'var(--text-secondary)' }}>
           <div className="flex justify-between">
             <span>Usable area</span>
-            <span className="font-medium">{usableAreaM2} m²</span>
+            <span style={{ fontWeight: 500, fontFamily: 'var(--font-ibm-plex-mono)' }}>{usableAreaM2} m²</span>
           </div>
           <div className="flex justify-between">
             <span>System size</span>
-            <span className="font-medium text-amber-600">{formatKWp(systemKwp)}</span>
+            <span style={{ fontWeight: 500, fontFamily: 'var(--font-ibm-plex-mono)', color: 'var(--accent)' }}>{formatKWp(systemKwp)}</span>
           </div>
           <div className="flex justify-between">
             <span>Est. panels</span>
-            <span className="font-medium">~{panelCount}</span>
+            <span style={{ fontWeight: 500, fontFamily: 'var(--font-ibm-plex-mono)' }}>~{panelCount}</span>
           </div>
         </div>
       </div>

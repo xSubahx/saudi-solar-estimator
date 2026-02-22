@@ -1,6 +1,7 @@
 'use client';
 import type { EconomicsResult } from '@/types';
 import { formatPaybackYears, formatCostPerPanel, formatCostPerKwp, formatSAR } from '@/lib/utils/formatters';
+import { useThemeColors } from '@/hooks/useThemeColors';
 
 interface EconomicsCardProps {
   economics: EconomicsResult;
@@ -33,13 +34,14 @@ function computeBreakEvenScenarios(economics: EconomicsResult) {
 }
 
 export function EconomicsCard({ economics }: EconomicsCardProps) {
+  const themeColors = useThemeColors();
   const paybackYears = economics.simplePaybackYears;
   const paybackExceedsLife = paybackYears > 25;
   const paybackNotViable = paybackYears > 50;
 
   // Ring percentage: capped at 100%, colored by viability
   const paybackPct = Math.min((paybackYears / 25) * 100, 100);
-  const ringColor = paybackExceedsLife ? '#d97706' : 'var(--accent)'; // amber-600 if over lifetime
+  const ringColor = paybackExceedsLife ? themeColors.warning : themeColors.accent;
   const displayYears = paybackNotViable
     ? 'N/A'
     : paybackYears > 25
@@ -50,6 +52,7 @@ export function EconomicsCard({ economics }: EconomicsCardProps) {
 
   return (
     <div
+      className="geo-border"
       style={{
         backgroundColor: 'var(--bg-card)',
         border: '1px solid var(--border)',
@@ -60,7 +63,7 @@ export function EconomicsCard({ economics }: EconomicsCardProps) {
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
         <div className="accent-line" />
-        <h3 style={{ fontFamily: 'var(--font-outfit)', fontWeight: 600, fontSize: '1rem', color: 'var(--text-primary)', margin: 0 }}>
+        <h3 style={{ fontFamily: 'var(--font-syne)', fontWeight: 600, fontSize: '1rem', color: 'var(--text-primary)', margin: 0 }}>
           Investment Analysis
         </h3>
       </div>
@@ -69,7 +72,7 @@ export function EconomicsCard({ economics }: EconomicsCardProps) {
       <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '20px' }}>
         <div style={{ position: 'relative', width: 80, height: 80, flexShrink: 0 }}>
           <svg width="80" height="80" viewBox="0 0 80 80">
-            <circle cx="40" cy="40" r="34" fill="none" stroke="var(--border)" strokeWidth="6" />
+            <circle cx="40" cy="40" r="34" fill="none" stroke={themeColors.border} strokeWidth="6" />
             <circle
               cx="40" cy="40" r="34"
               fill="none"
@@ -81,16 +84,13 @@ export function EconomicsCard({ economics }: EconomicsCardProps) {
               transform="rotate(-90 40 40)"
               style={{ transition: 'stroke-dashoffset 1s ease' }}
             />
-          </svg>
-          <div style={{
-            position: 'absolute', inset: 0,
-            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-          }}>
-            <span style={{ fontSize: '1.1rem', fontWeight: 700, color: ringColor, fontFamily: 'var(--font-outfit)' }}>
+            <text x="40" y="38" textAnchor="middle" fontSize="1.1rem" fontWeight="700" fill={themeColors.textPrimary} fontFamily="var(--font-ibm-plex-mono)">
               {displayYears}
-            </span>
-            <span style={{ fontSize: '0.6rem', color: 'var(--text-secondary)' }}>yrs</span>
-          </div>
+            </text>
+            <text x="40" y="52" textAnchor="middle" fontSize="0.6rem" fill={themeColors.textSecondary} fontFamily="var(--font-ibm-plex-mono)">
+              yrs
+            </text>
+          </svg>
         </div>
 
         <div>
@@ -106,18 +106,18 @@ export function EconomicsCard({ economics }: EconomicsCardProps) {
       {/* Warning banner when payback exceeds panel lifetime */}
       {paybackExceedsLife && (
         <div style={{
-          backgroundColor: '#fffbeb',
-          border: '1px solid #fbbf24',
+          backgroundColor: 'var(--warning-soft)',
+          border: '1px solid var(--warning)',
           borderRadius: '10px',
           padding: '12px 14px',
           marginBottom: '16px',
         }}>
-          <p style={{ fontSize: '0.8rem', fontWeight: 600, color: '#92400e', margin: '0 0 4px' }}>
+          <p style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-primary)', margin: '0 0 4px' }}>
             {paybackNotViable
               ? 'Investment does not pay back without export credits'
               : 'Payback exceeds panel lifetime (25 years)'}
           </p>
-          <p style={{ fontSize: '0.75rem', color: '#a16207', margin: 0 }}>
+          <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', margin: 0 }}>
             Saudi electricity rates (0.18 SAR/kWh) are heavily subsidized, making solar ROI challenging.
             Try: increase self-consumption via the slider, enable net billing with export credits,
             or find a lower installation cost.
@@ -164,10 +164,10 @@ function MetricItem({ label, value, highlight }: { label: string; value: string;
   return (
     <div style={{
       backgroundColor: 'var(--bg-secondary)',
-      borderRadius: '10px',
+      borderRadius: 'var(--radius-md)',
       padding: '12px',
     }}>
-      <p style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', margin: '0 0 4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+      <p style={{ fontSize: '0.7rem', fontFamily: 'var(--font-syne)', color: 'var(--text-secondary)', margin: '0 0 4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
         {label}
       </p>
       <p style={{
@@ -175,7 +175,7 @@ function MetricItem({ label, value, highlight }: { label: string; value: string;
         fontWeight: 600,
         margin: 0,
         color: highlight ? 'var(--accent)' : 'var(--text-primary)',
-        fontFamily: '"JetBrains Mono", monospace',
+        fontFamily: 'var(--font-ibm-plex-mono)',
       }}>
         {value}
       </p>

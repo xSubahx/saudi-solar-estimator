@@ -32,18 +32,18 @@ export function TechnicalAppendix({ result, inputs }: TechnicalAppendixProps) {
           cursor: 'pointer',
           color: 'var(--text-secondary)',
           fontSize: '0.85rem',
-          fontFamily: 'var(--font-outfit)',
+          fontFamily: 'var(--font-syne)',
         }}
       >
         <span>Technical Details — For Engineers &amp; Installers</span>
-        <span style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.3s ease' }}>▼</span>
+        <span style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.3s ease', color: 'var(--accent)' }}>▼</span>
       </button>
 
       {isOpen && (
         <div style={{ padding: '24px', backgroundColor: 'var(--bg-card)' }}>
           {/* System specs */}
           <div style={{ marginBottom: '24px' }}>
-            <h4 style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 12px' }}>
+            <h4 style={{ fontSize: '0.8rem', fontFamily: 'var(--font-syne)', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 12px' }}>
               System Specifications
             </h4>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
@@ -58,14 +58,14 @@ export function TechnicalAppendix({ result, inputs }: TechnicalAppendixProps) {
 
           {/* Monthly production table */}
           <div>
-            <h4 style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 12px' }}>
+            <h4 style={{ fontSize: '0.8rem', fontFamily: 'var(--font-syne)', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 12px' }}>
               Monthly Production (kWh)
             </h4>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '6px' }}>
               {result.monthlyBreakdown.slice(0, 12).map((m, i) => (
-                <div key={i} style={{ textAlign: 'center', backgroundColor: 'var(--bg-secondary)', borderRadius: '8px', padding: '8px 4px' }}>
-                  <p style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', margin: '0 0 4px' }}>{monthNames[i]}</p>
-                  <p style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-primary)', margin: 0, fontFamily: '"JetBrains Mono", monospace' }}>
+                <div key={i} style={{ textAlign: 'center', backgroundColor: 'var(--bg-secondary)', borderRadius: 'var(--radius-sm)', padding: '8px 4px' }}>
+                  <p style={{ fontSize: '0.65rem', fontFamily: 'var(--font-newsreader)', color: 'var(--text-secondary)', margin: '0 0 4px' }}>{monthNames[i]}</p>
+                  <p style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-primary)', margin: 0, fontFamily: 'var(--font-ibm-plex-mono)' }}>
                     {Math.round(m.productionKwh)}
                   </p>
                 </div>
@@ -74,7 +74,7 @@ export function TechnicalAppendix({ result, inputs }: TechnicalAppendixProps) {
           </div>
 
           {/* Data source footnote */}
-          <p style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', marginTop: '20px', marginBottom: 0, borderTop: '1px solid var(--border)', paddingTop: '16px' }}>
+          <p style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)', fontFamily: 'var(--font-newsreader)', fontStyle: 'italic', marginTop: '20px', marginBottom: 0, borderTop: '1px solid var(--border)', paddingTop: '16px' }}>
             Solar irradiance data: PVGIS-SARAH3 (Joint Research Centre, European Commission).
             Self-consumption range: Fraunhofer ISE literature (20–40%).
             Estimates only — verify with a qualified solar installer before investing.
@@ -87,9 +87,9 @@ export function TechnicalAppendix({ result, inputs }: TechnicalAppendixProps) {
 
 function SpecRow({ label, value }: { label: string; value: string }) {
   return (
-    <div style={{ backgroundColor: 'var(--bg-secondary)', borderRadius: '8px', padding: '8px 12px' }}>
-      <p style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', margin: '0 0 2px' }}>{label}</p>
-      <p style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-primary)', margin: 0, fontFamily: '"JetBrains Mono", monospace' }}>{value}</p>
+    <div style={{ backgroundColor: 'var(--bg-secondary)', borderRadius: 'var(--radius-sm)', padding: '8px 12px' }}>
+      <p style={{ fontSize: '0.65rem', fontFamily: 'var(--font-newsreader)', color: 'var(--text-secondary)', margin: '0 0 2px' }}>{label}</p>
+      <p style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-primary)', margin: 0, fontFamily: 'var(--font-ibm-plex-mono)' }}>{value}</p>
     </div>
   );
 }

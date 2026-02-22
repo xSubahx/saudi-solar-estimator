@@ -24,6 +24,20 @@ const ORIENTATIONS = [
   { label: 'North', azimuth: 0 },
 ];
 
+function toggleActiveStyle(): React.CSSProperties {
+  return {
+    backgroundColor: 'var(--accent)',
+    color: '#0C0E14',
+  };
+}
+
+function toggleInactiveStyle(): React.CSSProperties {
+  return {
+    backgroundColor: 'var(--bg-secondary)',
+    color: 'var(--text-secondary)',
+  };
+}
+
 export function RoofAreaInput({ value, onChange }: RoofAreaInputProps) {
   const [mode, setMode] = useState<'direct' | 'dimensions'>('direct');
   const [length, setLength] = useState('');
@@ -45,22 +59,28 @@ export function RoofAreaInput({ value, onChange }: RoofAreaInputProps) {
         <button
           type="button"
           onClick={() => setMode('direct')}
-          className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
-            mode === 'direct'
-              ? 'bg-amber-500 text-white'
-              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-          }`}
+          className="flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors"
+          style={mode === 'direct' ? toggleActiveStyle() : toggleInactiveStyle()}
+          onMouseEnter={(e) => {
+            if (mode !== 'direct') e.currentTarget.style.backgroundColor = 'var(--bg-elevated)';
+          }}
+          onMouseLeave={(e) => {
+            if (mode !== 'direct') e.currentTarget.style.backgroundColor = 'var(--bg-secondary)';
+          }}
         >
           Enter area directly
         </button>
         <button
           type="button"
           onClick={() => setMode('dimensions')}
-          className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
-            mode === 'dimensions'
-              ? 'bg-amber-500 text-white'
-              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-          }`}
+          className="flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors"
+          style={mode === 'dimensions' ? toggleActiveStyle() : toggleInactiveStyle()}
+          onMouseEnter={(e) => {
+            if (mode !== 'dimensions') e.currentTarget.style.backgroundColor = 'var(--bg-elevated)';
+          }}
+          onMouseLeave={(e) => {
+            if (mode !== 'dimensions') e.currentTarget.style.backgroundColor = 'var(--bg-secondary)';
+          }}
         >
           Enter length × width
         </button>
@@ -103,7 +123,10 @@ export function RoofAreaInput({ value, onChange }: RoofAreaInputProps) {
             />
           </div>
           <div className="space-y-1">
-            <label className="block text-sm font-medium text-slate-700">
+            <label
+              className="block text-sm font-medium"
+              style={{ color: 'var(--text-primary)' }}
+            >
               Usable portion: {usablePct}%
             </label>
             <input
@@ -113,15 +136,23 @@ export function RoofAreaInput({ value, onChange }: RoofAreaInputProps) {
               step={5}
               value={usablePct}
               onChange={(e) => { setUsablePct(parseInt(e.target.value)); handleDimensions(); }}
-              className="w-full accent-amber-500"
+              className="w-full"
+              style={{ accentColor: 'var(--accent)' }}
             />
-            <div className="flex justify-between text-xs text-slate-400">
+            <div className="flex justify-between text-xs" style={{ color: 'var(--text-tertiary)' }}>
               <span>50% (many obstructions)</span>
               <span>100% (clear roof)</span>
             </div>
           </div>
           {value.usableAreaM2 > 0 && (
-            <p className="text-sm text-amber-700 bg-amber-50 rounded-lg px-3 py-2">
+            <p
+              className="text-sm rounded-lg px-3 py-2"
+              style={{
+                color: 'var(--accent)',
+                backgroundColor: 'var(--accent-soft)',
+                border: '1px solid var(--accent)',
+              }}
+            >
               Usable area: <strong>{value.usableAreaM2} m²</strong>
             </p>
           )}
@@ -130,33 +161,46 @@ export function RoofAreaInput({ value, onChange }: RoofAreaInputProps) {
 
       {/* Orientation */}
       <div className="space-y-1">
-        <label className="block text-sm font-medium text-slate-700">
-          Roof orientation <span className="font-normal text-slate-400">(optional)</span>
+        <label
+          className="block text-sm font-medium"
+          style={{ color: 'var(--text-primary)' }}
+        >
+          Roof orientation{' '}
+          <span className="font-normal" style={{ color: 'var(--text-tertiary)' }}>(optional)</span>
         </label>
         <div className="grid grid-cols-3 gap-2">
-          {ORIENTATIONS.map((o) => (
-            <button
-              key={o.azimuth}
-              type="button"
-              onClick={() => onChange({ azimuthDeg: o.azimuth, useOptimalAngles: false })}
-              className={`py-1.5 px-2 rounded-lg text-xs font-medium transition-colors ${
-                value.azimuthDeg === o.azimuth && !value.useOptimalAngles
-                  ? 'bg-amber-500 text-white'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-              }`}
-            >
-              {o.label}
-            </button>
-          ))}
+          {ORIENTATIONS.map((o) => {
+            const isActive = value.azimuthDeg === o.azimuth && !value.useOptimalAngles;
+            return (
+              <button
+                key={o.azimuth}
+                type="button"
+                onClick={() => onChange({ azimuthDeg: o.azimuth, useOptimalAngles: false })}
+                className="py-1.5 px-2 rounded-lg text-xs font-medium transition-colors"
+                style={isActive ? toggleActiveStyle() : toggleInactiveStyle()}
+                onMouseEnter={(e) => {
+                  if (!isActive) e.currentTarget.style.backgroundColor = 'var(--bg-elevated)';
+                }}
+                onMouseLeave={(e) => {
+                  if (!isActive) e.currentTarget.style.backgroundColor = 'var(--bg-secondary)';
+                }}
+              >
+                {o.label}
+              </button>
+            );
+          })}
         </div>
         <button
           type="button"
           onClick={() => onChange({ useOptimalAngles: true })}
-          className={`w-full py-1.5 px-3 rounded-lg text-xs font-medium transition-colors ${
-            value.useOptimalAngles
-              ? 'bg-amber-500 text-white'
-              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-          }`}
+          className="w-full py-1.5 px-3 rounded-lg text-xs font-medium transition-colors"
+          style={value.useOptimalAngles ? toggleActiveStyle() : toggleInactiveStyle()}
+          onMouseEnter={(e) => {
+            if (!value.useOptimalAngles) e.currentTarget.style.backgroundColor = 'var(--bg-elevated)';
+          }}
+          onMouseLeave={(e) => {
+            if (!value.useOptimalAngles) e.currentTarget.style.backgroundColor = 'var(--bg-secondary)';
+          }}
         >
           I don&apos;t know — use PVGIS optimal angles
         </button>
@@ -165,7 +209,10 @@ export function RoofAreaInput({ value, onChange }: RoofAreaInputProps) {
       {/* Tilt */}
       {!value.useOptimalAngles && (
         <div className="space-y-1">
-          <label className="block text-sm font-medium text-slate-700">
+          <label
+            className="block text-sm font-medium"
+            style={{ color: 'var(--text-primary)' }}
+          >
             Tilt angle: {value.tiltDeg}°
           </label>
           <input
@@ -175,9 +222,10 @@ export function RoofAreaInput({ value, onChange }: RoofAreaInputProps) {
             step={1}
             value={value.tiltDeg}
             onChange={(e) => onChange({ tiltDeg: parseInt(e.target.value) })}
-            className="w-full accent-amber-500"
+            className="w-full"
+            style={{ accentColor: 'var(--accent)' }}
           />
-          <div className="flex justify-between text-xs text-slate-400">
+          <div className="flex justify-between text-xs" style={{ color: 'var(--text-tertiary)' }}>
             <span>0° (flat)</span>
             <span>22° (optimal KSA)</span>
             <span>45° (steep)</span>
@@ -187,23 +235,34 @@ export function RoofAreaInput({ value, onChange }: RoofAreaInputProps) {
 
       {/* Shading */}
       <div className="space-y-1">
-        <label className="block text-sm font-medium text-slate-700">Shading level</label>
+        <label
+          className="block text-sm font-medium"
+          style={{ color: 'var(--text-primary)' }}
+        >
+          Shading level
+        </label>
         <div className="grid grid-cols-3 gap-2">
-          {SHADING_LEVELS.map((s) => (
-            <button
-              key={s.value}
-              type="button"
-              onClick={() => onChange({ shadingLoss: s.value })}
-              title={s.description}
-              className={`py-2 px-3 rounded-lg text-xs font-medium transition-colors ${
-                value.shadingLoss === s.value
-                  ? 'bg-amber-500 text-white'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-              }`}
-            >
-              {s.label}
-            </button>
-          ))}
+          {SHADING_LEVELS.map((s) => {
+            const isActive = value.shadingLoss === s.value;
+            return (
+              <button
+                key={s.value}
+                type="button"
+                onClick={() => onChange({ shadingLoss: s.value })}
+                title={s.description}
+                className="py-2 px-3 rounded-lg text-xs font-medium transition-colors"
+                style={isActive ? toggleActiveStyle() : toggleInactiveStyle()}
+                onMouseEnter={(e) => {
+                  if (!isActive) e.currentTarget.style.backgroundColor = 'var(--bg-elevated)';
+                }}
+                onMouseLeave={(e) => {
+                  if (!isActive) e.currentTarget.style.backgroundColor = 'var(--bg-secondary)';
+                }}
+              >
+                {s.label}
+              </button>
+            );
+          })}
         </div>
       </div>
     </div>

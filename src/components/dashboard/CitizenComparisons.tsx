@@ -1,6 +1,7 @@
 'use client';
 import type { CitizenComparisonsData } from '@/types';
 import { formatMonthsFree } from '@/lib/utils/formatters';
+import { Sunrise, TreePine, Car, Lightbulb } from 'lucide-react';
 
 interface CitizenComparisonsProps {
   comparisons: CitizenComparisonsData;
@@ -9,25 +10,29 @@ interface CitizenComparisonsProps {
 export function CitizenComparisons({ comparisons }: CitizenComparisonsProps) {
   const items = [
     {
-      icon: '☀️',
+      icon: <Sunrise size={28} style={{ color: 'var(--accent)' }} />,
+      borderColor: 'var(--accent)',
       label: 'Like getting free electricity for',
       value: formatMonthsFree(comparisons.monthsFreePerYear),
       subtext: 'every year',
     },
     {
-      icon: '🌳',
+      icon: <TreePine size={28} style={{ color: 'var(--success)' }} />,
+      borderColor: 'var(--success)',
       label: 'Equivalent to planting',
       value: `${comparisons.treesEquivalentPerYear} trees`,
       subtext: 'annually (CO₂ offset)',
     },
     {
-      icon: '🚗',
+      icon: <Car size={28} style={{ color: 'var(--info)' }} />,
+      borderColor: 'var(--info)',
       label: 'Like avoiding',
       value: `${comparisons.carTripsAvoided} car trips`,
       subtext: 'Riyadh → Jeddah per year',
     },
     {
-      icon: '💡',
+      icon: <Lightbulb size={28} style={{ color: 'var(--warning)' }} />,
+      borderColor: 'var(--warning)',
       label: 'Enough electricity for',
       value: `${comparisons.householdsEquivalent} homes`,
       subtext: 'average Saudi household',
@@ -44,7 +49,7 @@ export function CitizenComparisons({ comparisons }: CitizenComparisonsProps) {
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
         <div className="accent-line" />
-        <h3 style={{ fontFamily: 'var(--font-outfit)', fontWeight: 600, fontSize: '1rem', color: 'var(--text-primary)', margin: 0 }}>
+        <h3 style={{ fontFamily: 'var(--font-syne)', fontWeight: 600, fontSize: '1rem', color: 'var(--text-primary)', margin: 0 }}>
           What This Means for You
         </h3>
       </div>
@@ -55,19 +60,20 @@ export function CitizenComparisons({ comparisons }: CitizenComparisonsProps) {
             key={item.label}
             style={{
               backgroundColor: 'var(--bg-secondary)',
-              borderRadius: '12px',
+              borderRadius: 'var(--radius-md)',
+              borderLeft: `3px solid ${item.borderColor}`,
               padding: '16px',
               display: 'flex',
               flexDirection: 'column',
               gap: '6px',
             }}
           >
-            <span style={{ fontSize: '1.5rem' }}>{item.icon}</span>
-            <p style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', margin: 0 }}>{item.label}</p>
-            <p style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--accent)', margin: 0, fontFamily: 'var(--font-outfit)' }}>
+            <span>{item.icon}</span>
+            <p style={{ fontSize: '0.7rem', fontFamily: 'var(--font-newsreader)', color: 'var(--text-secondary)', margin: 0 }}>{item.label}</p>
+            <p style={{ fontSize: '1rem', fontWeight: 700, fontFamily: 'var(--font-syne)', color: 'var(--accent)', margin: 0 }}>
               {item.value}
             </p>
-            <p style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', margin: 0 }}>{item.subtext}</p>
+            <p style={{ fontSize: '0.7rem', fontFamily: 'var(--font-newsreader)', fontStyle: 'italic', color: 'var(--text-tertiary)', margin: 0 }}>{item.subtext}</p>
           </div>
         ))}
       </div>

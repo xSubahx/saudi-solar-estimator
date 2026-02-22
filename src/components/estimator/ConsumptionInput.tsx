@@ -32,22 +32,36 @@ export function ConsumptionInput({ value, onChange }: ConsumptionInputProps) {
         <button
           type="button"
           onClick={() => setMode('kwh')}
-          className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
+          className="flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors"
+          style={
             mode === 'kwh'
-              ? 'bg-amber-500 text-white'
-              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-          }`}
+              ? { backgroundColor: 'var(--accent)', color: '#0C0E14' }
+              : { backgroundColor: 'var(--bg-secondary)', color: 'var(--text-secondary)' }
+          }
+          onMouseEnter={(e) => {
+            if (mode !== 'kwh') e.currentTarget.style.backgroundColor = 'var(--bg-elevated)';
+          }}
+          onMouseLeave={(e) => {
+            if (mode !== 'kwh') e.currentTarget.style.backgroundColor = 'var(--bg-secondary)';
+          }}
         >
           I know my kWh
         </button>
         <button
           type="button"
           onClick={() => setMode('sar')}
-          className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
+          className="flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors"
+          style={
             mode === 'sar'
-              ? 'bg-amber-500 text-white'
-              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-          }`}
+              ? { backgroundColor: 'var(--accent)', color: '#0C0E14' }
+              : { backgroundColor: 'var(--bg-secondary)', color: 'var(--text-secondary)' }
+          }
+          onMouseEnter={(e) => {
+            if (mode !== 'sar') e.currentTarget.style.backgroundColor = 'var(--bg-elevated)';
+          }}
+          onMouseLeave={(e) => {
+            if (mode !== 'sar') e.currentTarget.style.backgroundColor = 'var(--bg-secondary)';
+          }}
         >
           I only have SAR amount
         </button>
@@ -79,11 +93,17 @@ export function ConsumptionInput({ value, onChange }: ConsumptionInputProps) {
             hint="Enter your bill amount — we'll estimate kWh using SEC tiered rates"
           />
           {estimatedKwh !== null && (
-            <div className="rounded-lg bg-amber-50 border border-amber-200 px-3 py-2">
-              <p className="text-sm text-amber-800">
+            <div
+              className="rounded-lg px-3 py-2"
+              style={{
+                backgroundColor: 'var(--accent-soft)',
+                border: '1px solid var(--accent)',
+              }}
+            >
+              <p className="text-sm" style={{ color: 'var(--accent)' }}>
                 Estimated consumption: <strong>{estimatedKwh.toLocaleString()} kWh/mo</strong>
               </p>
-              <p className="text-xs text-amber-600 mt-0.5">
+              <p className="text-xs mt-0.5" style={{ color: 'var(--accent)' }}>
                 This is an estimate based on SEC residential tariff tiers. The actual value may differ due to fixed charges, VAT, or your customer category.
               </p>
             </div>
@@ -92,9 +112,15 @@ export function ConsumptionInput({ value, onChange }: ConsumptionInputProps) {
       )}
 
       {/* Customer category note */}
-      <div className="rounded-lg bg-slate-50 border border-slate-200 px-3 py-2.5">
-        <p className="text-xs text-slate-500">
-          <span className="font-medium text-slate-700">Residential tariff applied</span> —
+      <div
+        className="rounded-lg px-3 py-2.5"
+        style={{
+          backgroundColor: 'var(--bg-secondary)',
+          border: '1px solid var(--border)',
+        }}
+      >
+        <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+          <span className="font-medium" style={{ color: 'var(--text-primary)' }}>Residential tariff applied</span> —
           Tier 1: 0.18 SAR/kWh (0–6,000 kWh/mo), Tier 2: 0.30 SAR/kWh (above 6,000 kWh/mo).
           Commercial or custom rates can be set in Advanced Settings.
         </p>

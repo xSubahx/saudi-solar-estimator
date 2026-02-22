@@ -82,15 +82,33 @@ export function AdvancedSettings({ value, onChange, onReset }: AdvancedSettingsP
   ];
 
   return (
-    <div className="border border-slate-200 rounded-lg overflow-hidden">
+    <div
+      className="overflow-hidden"
+      style={{
+        border: '1px solid var(--border)',
+        borderRadius: 'var(--radius-md)',
+      }}
+    >
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between px-4 py-3 bg-slate-50 hover:bg-slate-100 text-sm font-medium text-slate-700"
+        className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium transition-colors"
+        style={{
+          backgroundColor: 'var(--bg-secondary)',
+          color: 'var(--text-primary)',
+          fontFamily: 'var(--font-syne)',
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.backgroundColor = 'var(--bg-elevated)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = 'var(--bg-secondary)';
+        }}
       >
         <span>Advanced assumptions</span>
         <svg
-          className={`h-4 w-4 text-slate-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+          className={`h-4 w-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+          style={{ color: 'var(--text-tertiary)' }}
           fill="none" viewBox="0 0 24 24" stroke="currentColor"
         >
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -113,7 +131,16 @@ export function AdvancedSettings({ value, onChange, onReset }: AdvancedSettingsP
                   onChange({ [field.key]: parseFloat(e.target.value) || 0 } as Partial<AdvancedConfig>)
                 }
               />
-              <p className="text-xs text-slate-400">Source: {field.source.split('.')[0]}</p>
+              <p
+                className="text-xs"
+                style={{
+                  color: 'var(--text-tertiary)',
+                  fontFamily: 'var(--font-newsreader)',
+                  fontStyle: 'italic',
+                }}
+              >
+                Source: {field.source.split('.')[0]}
+              </p>
             </div>
           ))}
 

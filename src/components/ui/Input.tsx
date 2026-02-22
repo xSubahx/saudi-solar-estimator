@@ -24,33 +24,85 @@ export function Input({
   return (
     <div className="space-y-1">
       {label && (
-        <label htmlFor={inputId} className="block text-sm font-medium text-slate-700">
+        <label
+          htmlFor={inputId}
+          className="block text-sm"
+          style={{
+            fontFamily: 'var(--font-syne)',
+            fontWeight: 500,
+            color: 'var(--text-primary)',
+          }}
+        >
           {label}
         </label>
       )}
       <div className="relative flex items-center">
         {prefix && (
-          <span className="absolute left-3 text-sm text-slate-500 pointer-events-none">{prefix}</span>
+          <span
+            className="absolute left-3 text-sm pointer-events-none"
+            style={{ color: 'var(--text-tertiary)' }}
+          >
+            {prefix}
+          </span>
         )}
         <input
           id={inputId}
           className={clsx(
-            'w-full rounded-lg border bg-white text-sm text-slate-900 placeholder:text-slate-400',
-            'focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent',
-            'disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed',
-            error ? 'border-red-400' : 'border-slate-200',
+            'w-full text-sm',
+            'focus:outline-none focus:ring-2',
+            'disabled:cursor-not-allowed disabled:opacity-60',
             prefix ? 'pl-8 pr-4 py-2.5' : 'px-3 py-2.5',
             suffix ? 'pr-12' : '',
             className
           )}
+          style={{
+            backgroundColor: 'var(--bg-elevated)',
+            border: `1px solid ${error ? 'var(--danger)' : 'var(--border)'}`,
+            borderRadius: 'var(--radius-sm)',
+            color: 'var(--text-primary)',
+            // Use CSS custom properties via inline style for focus ring
+            // @ts-expect-error CSS custom properties
+            '--tw-ring-color': 'var(--accent)',
+            transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
+          }}
+          onFocus={(e) => {
+            e.currentTarget.style.borderColor = 'var(--accent)';
+            props.onFocus?.(e);
+          }}
+          onBlur={(e) => {
+            e.currentTarget.style.borderColor = error ? 'var(--danger)' : 'var(--border)';
+            props.onBlur?.(e);
+          }}
           {...props}
         />
         {suffix && (
-          <span className="absolute right-3 text-sm text-slate-500 pointer-events-none">{suffix}</span>
+          <span
+            className="absolute right-3 text-sm pointer-events-none"
+            style={{ color: 'var(--text-secondary)' }}
+          >
+            {suffix}
+          </span>
         )}
       </div>
-      {hint && !error && <p className="text-xs text-slate-500">{hint}</p>}
-      {error && <p className="text-xs text-red-500">{error}</p>}
+      {hint && !error && (
+        <p
+          className="text-xs"
+          style={{
+            fontFamily: 'var(--font-newsreader)',
+            color: 'var(--text-tertiary)',
+          }}
+        >
+          {hint}
+        </p>
+      )}
+      {error && (
+        <p
+          className="text-xs"
+          style={{ color: 'var(--danger)' }}
+        >
+          {error}
+        </p>
+      )}
     </div>
   );
 }

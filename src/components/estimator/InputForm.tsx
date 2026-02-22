@@ -9,16 +9,18 @@ import { ConsumptionInput } from './ConsumptionInput';
 import { ExportToggle } from './ExportToggle';
 import { AdvancedSettings } from './AdvancedSettings';
 import { ASSUMPTIONS } from '@/lib/data/assumptions';
+import { MapPin, Home, Zap, SlidersHorizontal, Sun } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 
 interface InputFormProps {
   estimator: EstimatorHook;
 }
 
-const STEPS: { id: WizardStep; label: string; icon: string }[] = [
-  { id: 'location', label: 'Location', icon: '📍' },
-  { id: 'roof', label: 'Roof', icon: '🏠' },
-  { id: 'consumption', label: 'Usage', icon: '⚡' },
-  { id: 'options', label: 'Options', icon: '⚙️' },
+const STEPS: { id: WizardStep; label: string; icon: LucideIcon }[] = [
+  { id: 'location', label: 'Location', icon: MapPin },
+  { id: 'roof', label: 'Roof', icon: Home },
+  { id: 'consumption', label: 'Usage', icon: Zap },
+  { id: 'options', label: 'Options', icon: SlidersHorizontal },
 ];
 
 export function InputForm({ estimator }: InputFormProps) {
@@ -45,27 +47,64 @@ export function InputForm({ estimator }: InputFormProps) {
     if (prevIdx >= 0) setStep(STEPS[prevIdx].id);
   }
 
+  function getStepStyle(s: typeof STEPS[number], idx: number) {
+    if (s.id === step) {
+      return {
+        backgroundColor: 'var(--accent-soft)',
+        borderBottom: '2px solid var(--accent)',
+        color: 'var(--accent)',
+      };
+    }
+    if (idx < currentStepIdx) {
+      return {
+        color: 'var(--success)',
+      };
+    }
+    return {
+      color: 'var(--text-tertiary)',
+    };
+  }
+
   return (
-    <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+    <div
+      style={{
+        backgroundColor: 'var(--bg-card)',
+        border: '1px solid var(--border)',
+        borderRadius: 'var(--radius-lg)',
+      }}
+      className="shadow-sm overflow-hidden"
+    >
       {/* Progress stepper */}
-      <div className="flex border-b border-slate-100">
-        {STEPS.map((s, idx) => (
-          <button
-            key={s.id}
-            type="button"
-            onClick={() => setStep(s.id)}
-            className={`flex-1 py-3 text-center transition-colors ${
-              s.id === step
-                ? 'bg-amber-50 border-b-2 border-amber-500 text-amber-700'
-                : idx < currentStepIdx
-                ? 'text-green-600 hover:bg-slate-50'
-                : 'text-slate-400 hover:bg-slate-50'
-            }`}
-          >
-            <div className="text-lg">{s.icon}</div>
-            <div className="text-xs font-medium hidden sm:block">{s.label}</div>
-          </button>
-        ))}
+      <div className="flex" style={{ borderBottom: '1px solid var(--border)' }}>
+        {STEPS.map((s, idx) => {
+          const Icon = s.icon;
+          return (
+            <button
+              key={s.id}
+              type="button"
+              onClick={() => setStep(s.id)}
+              className="flex-1 py-3 text-center transition-colors"
+              style={getStepStyle(s, idx)}
+              onMouseEnter={(e) => {
+                if (s.id !== step) {
+                  e.currentTarget.style.backgroundColor = 'var(--bg-secondary)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (s.id !== step) {
+                  e.currentTarget.style.backgroundColor = '';
+                } else {
+                  e.currentTarget.style.backgroundColor = 'var(--accent-soft)';
+                }
+              }}
+            >
+              <div className="flex justify-center">
+                <Icon size={18} />
+              </div>
+              <div className="text-xs font-medium hidden sm:block">{s.label}</div>
+            </button>
+          );
+        })}
       </div>
 
       {/* Step content */}
@@ -73,8 +112,18 @@ export function InputForm({ estimator }: InputFormProps) {
         {step === 'location' && (
           <>
             <div>
-              <h2 className="text-base font-semibold text-slate-900">Select your city</h2>
-              <p className="text-xs text-slate-500 mt-0.5">Solar data will be fetched from PVGIS for this location.</p>
+              <h2
+                className="text-base"
+                style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-syne)', fontWeight: 600 }}
+              >
+                Select your city
+              </h2>
+              <p
+                className="text-xs mt-0.5"
+                style={{ color: 'var(--text-secondary)', fontFamily: 'var(--font-newsreader)' }}
+              >
+                Solar data will be fetched from PVGIS for this location.
+              </p>
             </div>
             <CitySelector value={inputs.city} onChange={updateCity} />
           </>
@@ -83,8 +132,18 @@ export function InputForm({ estimator }: InputFormProps) {
         {step === 'roof' && (
           <>
             <div>
-              <h2 className="text-base font-semibold text-slate-900">Your rooftop</h2>
-              <p className="text-xs text-slate-500 mt-0.5">Enter the usable area available for solar panels.</p>
+              <h2
+                className="text-base"
+                style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-syne)', fontWeight: 600 }}
+              >
+                Your rooftop
+              </h2>
+              <p
+                className="text-xs mt-0.5"
+                style={{ color: 'var(--text-secondary)', fontFamily: 'var(--font-newsreader)' }}
+              >
+                Enter the usable area available for solar panels.
+              </p>
             </div>
             <RoofAreaInput value={inputs.roof} onChange={updateRoof} />
           </>
@@ -93,8 +152,18 @@ export function InputForm({ estimator }: InputFormProps) {
         {step === 'consumption' && (
           <>
             <div>
-              <h2 className="text-base font-semibold text-slate-900">Electricity consumption</h2>
-              <p className="text-xs text-slate-500 mt-0.5">From your last electricity bill. The more accurate, the better.</p>
+              <h2
+                className="text-base"
+                style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-syne)', fontWeight: 600 }}
+              >
+                Electricity consumption
+              </h2>
+              <p
+                className="text-xs mt-0.5"
+                style={{ color: 'var(--text-secondary)', fontFamily: 'var(--font-newsreader)' }}
+              >
+                From your last electricity bill. The more accurate, the better.
+              </p>
             </div>
             <ConsumptionInput value={inputs.consumption} onChange={updateConsumption} />
           </>
@@ -103,8 +172,18 @@ export function InputForm({ estimator }: InputFormProps) {
         {step === 'options' && (
           <>
             <div>
-              <h2 className="text-base font-semibold text-slate-900">Options</h2>
-              <p className="text-xs text-slate-500 mt-0.5">Export to grid and installation cost (optional).</p>
+              <h2
+                className="text-base"
+                style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-syne)', fontWeight: 600 }}
+              >
+                Options
+              </h2>
+              <p
+                className="text-xs mt-0.5"
+                style={{ color: 'var(--text-secondary)', fontFamily: 'var(--font-newsreader)' }}
+              >
+                Export to grid and installation cost (optional).
+              </p>
             </div>
             <ExportToggle value={inputs.export} onChange={updateExport} />
             <AdvancedSettings
@@ -140,17 +219,30 @@ export function InputForm({ estimator }: InputFormProps) {
               type="button"
               className="flex-1"
             >
-              {isLoading ? 'Calculating…' : '☀️ Calculate My Solar Savings'}
+              {isLoading ? 'Calculating…' : <><Sun size={16} style={{ marginRight: 6 }} /> Calculate My Solar Savings</>}
             </Button>
           )}
         </div>
 
         {/* Quick summary on options step */}
         {step === 'options' && (
-          <div className="text-xs text-slate-500 bg-slate-50 rounded-lg px-3 py-2 space-y-0.5">
-            <div>📍 {inputs.city?.nameEn}</div>
-            <div>🏠 {inputs.roof.usableAreaM2} m² usable roof</div>
-            <div>⚡ {inputs.consumption.monthlyKwh.toLocaleString()} kWh/mo</div>
+          <div
+            className="text-xs px-3 py-2 space-y-0.5"
+            style={{
+              backgroundColor: 'var(--bg-secondary)',
+              color: 'var(--text-secondary)',
+              borderRadius: 'var(--radius-md)',
+            }}
+          >
+            <div className="flex items-center gap-1.5">
+              <MapPin size={14} /> {inputs.city?.nameEn}
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Home size={14} /> {inputs.roof.usableAreaM2} m² usable roof
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Zap size={14} /> {inputs.consumption.monthlyKwh.toLocaleString()} kWh/mo
+            </div>
           </div>
         )}
       </div>
